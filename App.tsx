@@ -8,15 +8,20 @@ import Animated, {
   withRepeat,
   SharedValue,
   useAnimatedGestureHandler,
+  useAnimatedScrollHandler,
 } from "react-native-reanimated";
 import {
   GestureHandlerRootView,
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
+import { Page } from "components/Page";
 
 const SIZE = 100.0;
+
 const CIRCLE_RADIUS = SIZE * 2;
+
+const WORDS = ["What's", "up", "mobile", "devs?"];
 
 type ContextType = {
   translateX: number;
@@ -88,6 +93,14 @@ export default function App() {
   //   };
   // });
 
+  // ----------------------------Interpolate----------------------------
+
+  const translateX = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    translateX.value = event.contentOffset.x;
+  });
+
   return (
     // ----------------------------Introduction & PanGestureHandler----------------------------
 
@@ -105,8 +118,17 @@ export default function App() {
 
     // ----------------------------Interpolate----------------------------
 
-    <Animated.ScrollView>
-
+    <Animated.ScrollView
+      pagingEnabled
+      horizontal
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      onScroll={scrollHandler}
+      scrollEventThrottle={16}
+    >
+      {WORDS.map((title, index) => {
+        return <Page key={index.toString()} title={title} index={index} translateX={translateX} />;
+      })}
     </Animated.ScrollView>
   );
 }
@@ -115,8 +137,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  contentContainer: {
+    flexGrow: 1,
+    alignItems:"flex-end"
   },
   button: {
     backgroundColor: "cyan",

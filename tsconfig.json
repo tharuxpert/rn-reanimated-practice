@@ -10,7 +10,15 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "components/*": ["components/*"]
+    }
   },
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js"]
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js"
+  ],
+  "extends": "expo/tsconfig.base"
 }
