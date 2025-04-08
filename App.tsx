@@ -1,84 +1,105 @@
-import { ColorPicker } from "components/ColorPicker";
-import React, { useCallback } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, {
-  useAnimatedStyle,
+  useAnimatedProps,
+  useDerivedValue,
   useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
+import { ReText } from "react-native-redash";
+import Svg, { Circle } from "react-native-svg";
 
-const COLORS = [
-  "red",
-  "purple",
-  "blue",
-  "cyan",
-  "green",
-  "yellow",
-  "orange",
-  "black",
-  "white",
-] as const;
+const BACKGROUND_COLOR = "#444B6F";
+const BACKGROUND_STROKE_COLOR = "#303858";
+const STROKE_COLOR = "#A6E1FA";
 
-const BACKGROUND_COLOR = "rgba(0,0,0,0.9)";
+const { width, height } = Dimensions.get("window");
 
-const { width } = Dimensions.get("window");
+const CIRCLE_LENGTH = 1000;
+const R = CIRCLE_LENGTH / (2 * Math.PI);
 
-const CIRCLE_WIDTH = width * 0.8;
-const PICKER_WIDTH = width * 0.9;
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function App() {
-  const pickedColor = useSharedValue<string>(COLORS[0]);
+  const progress = useSharedValue(0);
 
-  const onColorChange = useCallback((color: string | number) => {
-    "worklet";
-    pickedColor.value = String(color);
-  }, []);
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: CIRCLE_LENGTH * (1 - progress.value),
+  }));
 
-  const rStyle = useAnimatedStyle(() => {
-    return {
-      backgroundColor: pickedColor.value,
-    };
+  const progressText = useDerivedValue(() => {
+    return `${Math.floor(progress.value * 100)}`;
   });
 
+  const onPress = useCallback(() => {
+    progress.value = withTiming(progress.value > 0 ? 0 : 1, { duration: 2000 });
+  }, []);
+
   return (
-    <>
-      <View style={styles.topContainer}>
-        <Animated.View style={[styles.circle, rStyle]} />
-      </View>
-      <View style={styles.bottomContainer}>
-        <ColorPicker
-          colors={COLORS}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gradient}
-          maxWidth={PICKER_WIDTH}
-          onColorChange={onColorChange}
+    <View style={styles.container}>
+      <ReText style={styles.progressText} text={progressText} />
+      <Svg style={{ position: "absolute" }}>
+        <Circle
+          cx={width / 2}
+          cy={height / 2}
+          r={R}
+          stroke={BACKGROUND_STROKE_COLOR}
+          strokeWidth={30}
+          fill={"transparent"}
         />
-      </View>
-    </>
+        <AnimatedCircle
+          cx={width / 2}
+          cy={height / 2}
+          r={R}
+          stroke={STROKE_COLOR}
+          strokeWidth={15}
+          fill={"transparent"}
+          strokeDasharray={CIRCLE_LENGTH}
+          animatedProps={animatedProps}
+          strokeLinecap={"round"}
+        />
+      </Svg>
+      <TouchableOpacity onPress={onPress} style={styles.button}>
+        <Text style={styles.buttonText}>Run</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  topContainer: {
-    flex: 3,
-    backgroundColor: BACKGROUND_COLOR,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bottomContainer: {
+  container: {
     flex: 1,
     backgroundColor: BACKGROUND_COLOR,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  progressText: {
+    fontSize: 80,
+    color: "rgba(256,256,256,0.7)",
+    textAlign: "center",
+    width: 200,
+    position: "relative",
+    top: -20,
+  },
+  button: {
+    position: "absolute",
+    bottom: 80,
+    width: width * 0.7,
+    height: 60,
+    backgroundColor: BACKGROUND_STROKE_COLOR,
+    borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
   },
-  gradient: {
-    height: 40,
-    width: PICKER_WIDTH,
-    borderRadius: 20,
-  },
-  circle: {
-    width: CIRCLE_WIDTH,
-    height: CIRCLE_WIDTH,
-    borderRadius: CIRCLE_WIDTH / 2,
+  buttonText: {
+    fontSize: 25,
+    color: "white",
+    letterSpacing: 2,
   },
 });
