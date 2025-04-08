@@ -2,6 +2,7 @@ import React from "react";
 import { Dimensions, View, StyleSheet, Text } from "react-native";
 import Animated, {
   Extrapolate,
+  Extrapolation,
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
@@ -24,14 +25,14 @@ const Page: React.FC<PageProps> = ({ index, translateX, title }) => {
       translateX.value,
       inputRange,
       [0, 1, 0],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     );
 
     const borderRadius = interpolate(
       translateX.value,
       inputRange,
       [0, SIZE / 2, 0],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     );
 
     return {
