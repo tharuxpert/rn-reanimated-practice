@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
-      "components/*": ["components/*"]
+      "components/*": ["src/animations/Interpolate with ScrollView/components/*"]
     }
   },
   "exclude": [
