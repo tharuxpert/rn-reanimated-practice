@@ -1,10 +1,13 @@
+import Ripple from "components/Ripple";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Hello, World!</Text>
+      <Ripple style={styles.ripple} onTap={() => console.log("Tapped")}>
+        <Text style={{ fontSize: 25 }}>Tap</Text>
+      </Ripple>
     </View>
   );
 }
@@ -15,5 +18,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+  },
+  ripple: {
+    width: 200,
+    height: 200,
+    backgroundColor: "white",
+    elevation: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 25,
   },
 });
